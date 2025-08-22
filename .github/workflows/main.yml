@@ -1,0 +1,41 @@
+name: Monthly CSV Download and Save
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+
+jobs:
+  download-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+
+    - name: Download CSV from secret URL
+      run: |
+        curl -sL "${{ secrets.CSV_URL }}" -o temp.csv
+
+    - name: Create BOM付き latest.csv
+      run: |
+        echo -ne '\xEF\xBB\xBF' > latest.csv
+        cat temp.csv >> latest.csv
+
+    - name: Extract YYYY-MM from date column
+      run: |
+        col_index=$(head -n 1 temp.csv | tr ',' '\n' | grep -n '^date$' | cut -d: -f1)
+        date_value=$(awk -F',' -v col="$col_index" 'NR==2 {print $col}' temp.csv)
+        year_month=$(echo "$date_value" | cut -d'-' -f1,2)
+        cp latest.csv "${year_month}.csv"
+
+    - name: Commit and push if changes exist
+      run: |
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'actions@github.com'
+        git add -N .
+        if ! git diff --exit-code --quiet; then
+          git add *.csv
+          git commit -m "Update CSVs for ${{ env.year_month }}"
+          git push
+        fi

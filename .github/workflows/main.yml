@@ -16,6 +16,7 @@ jobs:
     - name: Download CSV from secret URL
       run: |
         curl -sL "${{ secrets.CSV_URL }}" -o temp.csv
+        cp temp.csv ./docs/calendar.csv
 
     - name: Create BOM付き latest.csv
       run: |

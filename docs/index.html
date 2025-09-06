@@ -48,6 +48,11 @@
         #calendar {
           zoom: 80%;
         }
+        /* 印刷時は今日の強調をリセット */
+        .fc-day-today {
+          background: none !important;
+          border: none !important;
+        }
       }
     </style>
   </head>
@@ -61,9 +66,16 @@
     </div>
     <div id="calendar"></div>
 
+    <!-- ライブラリ -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/utc.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/timezone.js"></script>
     <script>
+      dayjs.extend(dayjs_plugin_utc);
+      dayjs.extend(dayjs_plugin_timezone);
+
       const url = "calendar.csv";
       const islandHospitals = [
         "しのざき整形外科",
@@ -136,28 +148,39 @@
                 center: "title",
                 right: "dayGridMonth,listWeek",
               },
-                buttonText: {
+              buttonText: {
                 today: "今日",
-                month: "月表示",
-                list: "一覧"
+                month: "月",
+                list: "一覧",
               },
               dayCellDidMount: function (info) {
-                // 日本時間で今日の日付を取得
-                const jstNow = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
-                const jstDateString = jstNow.toISOString().split("T")[0];
-              
-                // セルの日付（UTC）をISO文字列に変換
-                const cellDateString = info.date.toISOString().split("T")[0];
-              
-                // 日付が一致すれば装飾
-                if (cellDateString === jstDateString) {
+                const today = dayjs().tz("Asia/Tokyo").format("YYYY-MM-DD");
+                const cellDate = dayjs(info.date)
+                  .tz("Asia/Tokyo")
+                  .format("YYYY-MM-DD");
+
+                // 今日の強調表示（印刷時はCSSで消える）
+                if (cellDate === today) {
                   info.el.style.backgroundColor = "#fffbe6";
                   info.el.style.border = "2px solid #ff9900";
+                }
+
+                // 土曜日: 薄い青
+                if (info.date.getDay() === 6) {
+                  info.el.style.backgroundColor = "#e6f7ff";
+                }
+
+                // 日曜日: 薄い赤
+                if (info.date.getDay() === 0) {
+                  info.el.style.backgroundColor = "#ffe6e6";
                 }
               },
               eventDidMount: function (info) {
                 const { medical, time, week } = info.event.extendedProps;
-                info.el.setAttribute("title", `診療科: ${medical}\n時間帯: ${time}\n曜日: ${week}`);
+                info.el.setAttribute(
+                  "title",
+                  `診療科: ${medical}\n時間帯: ${time}\n曜日: ${week}`
+                );
               },
             }
           );
@@ -169,7 +192,9 @@
             const filtered =
               selected === "all"
                 ? allEvents
-                : allEvents.filter((e) => e.extendedProps.hospital === selected);
+                : allEvents.filter(
+                    (e) => e.extendedProps.hospital === selected
+                  );
             calendar.removeAllEvents();
             calendar.addEventSource(filtered);
           });

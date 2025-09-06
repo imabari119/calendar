@@ -114,7 +114,6 @@
               start: row.date,
               extendedProps: {
                 medical: row.medical,
-                week: row.week,
                 hospital: row.name,
                 time: row.time,
               },
@@ -149,7 +148,7 @@
                 }
               },
               eventDidMount: function (info) {
-                const { medical, time } = info.event.extendedProps;
+                const { medical, time, week } = info.event.extendedProps;
                 info.el.setAttribute("title", `曜日: ${week}\n診療科: ${medical}\n時間帯: ${time}`);
               },
             }

@@ -25,6 +25,7 @@ jobs:
       run: |
         echo -ne '\xEF\xBB\xBF' > latest.csv
         cat temp.csv >> latest.csv
+        cp latest.csv ./docs/download.csv
 
     - name: Extract YYYY-MM from date column
       run: |

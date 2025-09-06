@@ -134,6 +134,11 @@
                 center: "title",
                 right: "dayGridMonth,listWeek",
               },
+                buttonText: {
+                today: "今日",
+                month: "月表示",
+                list: "一覧"
+              },
               dayCellDidMount: function (info) {
                 const today = new Date().toISOString().split("T")[0];
                 if (info.date.toISOString().split("T")[0] === today) {

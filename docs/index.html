@@ -142,8 +142,15 @@
                 list: "一覧"
               },
               dayCellDidMount: function (info) {
-                const today = new Date().toISOString().split("T")[0];
-                if (info.date.toISOString().split("T")[0] === today) {
+                // 日本時間で今日の日付を取得
+                const jstNow = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+                const jstDateString = jstNow.toISOString().split("T")[0];
+              
+                // セルの日付（UTC）をISO文字列に変換
+                const cellDateString = info.date.toISOString().split("T")[0];
+              
+                // 日付が一致すれば装飾
+                if (cellDateString === jstDateString) {
                   info.el.style.backgroundColor = "#fffbe6";
                   info.el.style.border = "2px solid #ff9900";
                 }

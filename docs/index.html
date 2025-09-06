@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>今治市 医療当番カレンダー</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 20px;
+      }
+      h2 {
+        text-align: center;
+      }
+      #calendar {
+        max-width: 900px;
+        margin: auto;
+      }
+      #filter {
+        margin: 20px auto;
+        text-align: center;
+      }
+      select {
+        padding: 6px;
+        font-size: 14px;
+      }
+      @media (max-width: 600px) {
+        #calendar {
+          width: 100%;
+          font-size: 12px;
+        }
+        select {
+          width: 90%;
+        }
+      }
+      @media print {
+        body {
+          margin: 0;
+        }
+        #filter,
+        h2 {
+          display: none;
+        }
+        #calendar {
+          zoom: 80%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h2>📅 今治市 当番医カレンダー</h2>
+    <div id="filter">
+      <label for="hospitalSelect">🏥 病院で絞り込み：</label>
+      <select id="hospitalSelect">
+        <option value="all">すべて表示</option>
+      </select>
+    </div>
+    <div id="calendar"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script>
+      const url = "calendar.csv";
+      const islandHospitals = [
+        "しのざき整形外科",
+        "はかた外科胃腸科",
+        "喜多嶋診療所",
+        "斎藤クリニック",
+        "大三島中央病院",
+        "片山医院",
+        "有津むらかみクリニック",
+      ];
+
+      function getEmoji(medical, hospital) {
+        if (medical === "小児科") return "🧒";
+        if (medical === "内科") return "🩺";
+        if (islandHospitals.includes(hospital)) return "🏝️";
+        return "🏥";
+      }
+
+      function getColor(medical, hospital) {
+        if (medical === "小児科") return "#e91e63";
+        if (medical === "内科") return "#4caf50";
+        if (islandHospitals.includes(hospital)) return "#ffb300";
+        return "#607d8b";
+      }
+
+      Papa.parse(url, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function (results) {
+          const data = results.data;
+
+          // 病院名一覧を抽出
+          const hospitals = [...new Set(data.map((row) => row.name))].sort();
+          const select = document.getElementById("hospitalSelect");
+          hospitals.forEach((name) => {
+            const opt = document.createElement("option");
+            opt.value = name;
+            opt.textContent = name;
+            select.appendChild(opt);
+          });
+
+          // イベント生成（順番保持）
+          const allEvents = data.map((row, index) => {
+            const emoji = getEmoji(row.medical, row.name);
+            return {
+              title: `${emoji} ${row.name} (${row.time})`,
+              start: row.date,
+              extendedProps: {
+                medical: row.medical,
+                hospital: row.name,
+                time: row.time,
+              },
+              color: getColor(row.medical, row.name),
+              order: index,
+            };
+          });
+
+          // カレンダー初期化
+          const calendar = new FullCalendar.Calendar(
+            document.getElementById("calendar"),
+            {
+              initialView: "dayGridMonth",
+              locale: "ja",
+              events: allEvents,
+              eventOrder: "order",
+              headerToolbar: {
+                left: "prev,next today",
+                center: "title",
+                right: "dayGridMonth,listWeek",
+              },
+              dayCellDidMount: function (info) {
+                const today = new Date().toISOString().split("T")[0];
+                if (info.date.toISOString().split("T")[0] === today) {
+                  info.el.style.backgroundColor = "#fffbe6";
+                  info.el.style.border = "2px solid #ff9900";
+                }
+              },
+              eventDidMount: function (info) {
+                const { medical, time } = info.event.extendedProps;
+                info.el.setAttribute("title", `診療科: ${medical}\n時間帯: ${time}`);
+              },
+            }
+          );
+          calendar.render();
+
+          // 病院フィルター
+          select.addEventListener("change", () => {
+            const selected = select.value;
+            const filtered =
+              selected === "all"
+                ? allEvents
+                : allEvents.filter((e) => e.extendedProps.hospital === selected);
+            calendar.removeAllEvents();
+            calendar.addEventSource(filtered);
+          });
+        },
+      });
+    </script>
+  </body>
+</html>

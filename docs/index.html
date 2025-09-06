@@ -149,7 +149,7 @@
               },
               eventDidMount: function (info) {
                 const { medical, time } = info.event.extendedProps;
-                info.el.setAttribute("title", `診療科: ${medical}\n時間帯: ${time}`);
+                info.el.setAttribute("title", `曜日: ${week}\n診療科: ${medical}\n時間帯: ${time}`);
               },
             }
           );

@@ -88,6 +88,7 @@
       ];
 
       function getEmoji(medical, hospital) {
+        if (medical === "整形外科") return "🩼";
         if (medical === "小児科") return "🧒";
         if (medical === "内科") return "🩺";
         if (islandHospitals.includes(hospital)) return "🏝️";
@@ -95,6 +96,7 @@
       }
 
       function getColor(medical, hospital) {
+        if (medical === "整形外科") return "#3f51b5";
         if (medical === "小児科") return "#e91e63";
         if (medical === "内科") return "#4caf50";
         if (islandHospitals.includes(hospital)) return "#ffb300";

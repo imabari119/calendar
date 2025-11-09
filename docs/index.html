@@ -10,62 +10,71 @@
     <style>
       body {
         font-family: sans-serif;
-        margin: 20px;
+        /* マージンをリセット */
+        margin: 0; 
       }
+      /* タイトルは不要 */
       h2 {
-        text-align: center;
+        display: none;
       }
       #calendar {
-        max-width: 900px;
-        margin: auto;
+        /* 最大幅を設定せず、画面幅いっぱいに広げる */
+        max-width: none; 
+        margin: 0;
         height: auto;
       }
+      /* フィルターは不要 */
       #filter {
-        margin: 20px auto;
-        text-align: center;
+        display: none;
       }
-      select {
-        padding: 6px;
-        font-size: 14px;
-      }
+      
+      /* レスポンシブ対応は残しておく */
       @media (max-width: 600px) {
         #calendar {
           width: 100%;
           font-size: 12px;
         }
-        select {
-          width: 90%;
-        }
       }
+      
+      /* 印刷時の設定を維持 */
       @media print {
         body {
           margin: 0;
           width: 100%;
           height: 100vh;
-          overflow: hidden; /* スクロールバーを非表示にする */
+          overflow: hidden; 
+          font-size: 8pt; 
         }
+        /* 印刷時も不要 */
         #filter,
         h2 {
           display: none;
         }
         #calendar {
-          /* A4横で最大化 */
           zoom: 100%;
-          padding: 10px; /* 少し余白を設ける */
+          padding: 5px; 
         }
-        /* 印刷時は今日の強調をリセット */
         .fc-day-today {
           background: none !important;
           border: none !important;
         }
-        /* A4横の紙面全体を使うための設定 */
         @page {
-            size: A4 landscape; /* A4横に設定 */
-            margin: 0.5cm; /* 印刷時の余白を最小限に */
+            size: A4 landscape;
+            margin: 0.3cm; 
         }
-        /* 印刷時にツールバーを非表示にする */
+        /* ツールバーも不要 */
         .fc-toolbar {
             display: none;
+        }
+        .fc-daygrid-body,
+        .fc-scrollgrid-sync-table {
+            height: 100%;
+        }
+        .fc-daygrid-day-frame {
+            min-height: 0 !important;
+        }
+        .fc-daygrid-event-harness {
+            margin-bottom: 0px; 
         }
       }
     </style>
@@ -123,7 +132,7 @@
         complete: function (results) {
           const data = results.data;
 
-          // 病院名一覧を抽出
+          // 病院名一覧を抽出（フィルター機能は無くなったが、データ処理は残す）
           const hospitals = [...new Set(data.map((row) => row.name))].sort();
           const select = document.getElementById("hospitalSelect");
           hospitals.forEach((name) => {
@@ -158,18 +167,11 @@
               locale: "ja",
               events: allEvents,
               eventOrder: "order",
-              // 印刷・表示時のスクロール抑制のため高さを自動調整
               height: 'auto', 
-              headerToolbar: {
-                left: "prev,next today",
-                center: "title",
-                right: "dayGridMonth,listWeek",
-              },
-              buttonText: {
-                today: "今日",
-                month: "カレンダー",
-                list: "一覧",
-              },
+              
+              // ヘッダーツールバーを非表示
+              headerToolbar: false,
+              
               dayCellDidMount: function (info) {
                 const today = dayjs().tz("Asia/Tokyo").format("YYYY-MM-DD");
                 const cellDate = dayjs(info.date)
@@ -203,7 +205,7 @@
           );
           calendar.render();
 
-          // 病院フィルター
+          // 病院フィルター（機能としては不要だが、エラー回避のため残しておく）
           select.addEventListener("change", () => {
             const selected = select.value;
             const filtered =

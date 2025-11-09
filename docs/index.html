@@ -40,54 +40,18 @@
       @media print {
         body {
           margin: 0;
-          width: 100%;
-          height: 100vh;
-          overflow: hidden;
         }
-        
-        /* 💡 修正箇所1: <h2> (タイトル) と #filter (絞り込み) を非表示にする */
         #filter,
         h2 {
           display: none;
         }
-        
         #calendar {
-          /* A4横で最大化 */
-          zoom: 100%;
-          padding: 10px;
+          zoom: 80%;
         }
         /* 印刷時は今日の強調をリセット */
         .fc-day-today {
           background: none !important;
           border: none !important;
-        }
-        /* A4横の紙面全体を使うための設定 */
-        @page {
-            size: A4 landscape;
-            margin: 0.5cm;
-        }
-        
-        /* 💡 修正箇所2: 年月(`.fc-toolbar-title`)以外のボタンを非表示にする */
-        /* prev/next/todayボタンを非表示 */
-        .fc-button-group {
-            display: none !important;
-        }
-        /* 年月タイトル(`.fc-toolbar-title`)を囲む要素のフレックス設定をリセット */
-        .fc-header-toolbar {
-            justify-content: center !important; /* 年月を中央寄せ */
-            margin-bottom: 0.5em !important; /* 年月とカレンダーの間に少しスペースを確保 */
-        }
-        /* 年月タイトルだけを残す */
-        .fc-header-toolbar .fc-toolbar-chunk:first-child,
-        .fc-header-toolbar .fc-toolbar-chunk:last-child {
-            visibility: hidden !important; /* 要素の領域は残して中身を非表示にする */
-            width: 0 !important; /* 領域自体も消す */
-            padding: 0 !important;
-        }
-        /* 年月タイトルのフォントサイズを大きくし、強調する */
-        .fc-toolbar-title {
-            font-size: 1.5em !important; 
-            margin: 0 auto !important;
         }
       }
     </style>
@@ -102,6 +66,7 @@
     </div>
     <div id="calendar"></div>
 
+    <!-- ライブラリ -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
@@ -180,8 +145,6 @@
               locale: "ja",
               events: allEvents,
               eventOrder: "order",
-              // 印刷・表示時のスクロール抑制のため高さを自動調整
-              height: 'auto', 
               headerToolbar: {
                 left: "prev,next today",
                 center: "title",

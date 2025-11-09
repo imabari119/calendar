@@ -63,10 +63,17 @@
             size: A4 landscape; /* A4横に設定 */
             margin: 0.5cm; /* 印刷時の余白を最小限に */
         }
-        /* 印刷時にツールバーを非表示にする */
-        .fc-toolbar {
-            display: none;
+        
+        /* 💡 修正箇所: ボタン群だけを非表示にする */
+        /* prev/next/todayボタンを格納する左側のコンテナを非表示 */
+        .fc-header-toolbar .fc-toolbar-chunk:first-child {
+            display: none !important;
         }
+        /* month/listWeekボタンを格納する右側のコンテナを非表示 */
+        .fc-header-toolbar .fc-toolbar-chunk:last-child {
+            display: none !important;
+        }
+        /* タイトルは真ん中のコンテナにあるため表示されたままになります */
       }
     </style>
   </head>

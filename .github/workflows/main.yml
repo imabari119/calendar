@@ -16,7 +16,6 @@ jobs:
     - name: Download CSV from secret URL
       run: |
         curl -sfL "${{ secrets.CSV_URL }}" -o temp.csv
-        cp temp.csv ./docs/calendar.csv
     
     - name: Debug curl output
       run: head -n 10 temp.csv
@@ -25,7 +24,6 @@ jobs:
       run: |
         echo -ne '\xEF\xBB\xBF' > latest.csv
         cat temp.csv >> latest.csv
-        cp latest.csv ./docs/download.csv
 
     - name: Extract YYYY-MM from date column
       run: |
@@ -39,7 +37,7 @@ jobs:
       run: |
         git config --global user.name 'GitHub Actions'
         git config --global user.email 'actions@github.com'
-        git add '*.csv' 'docs/*.csv'
+        git add '*.csv'
         if ! git diff --cached --exit-code --quiet; then
           git commit -m "Update CSVs for ${year_month}"
           git push

@@ -76,7 +76,7 @@
       dayjs.extend(dayjs_plugin_utc);
       dayjs.extend(dayjs_plugin_timezone);
 
-      const url = "schedule.csv";
+      const csvdata = "schedule.csv";
       const islandHospitals = [
         "しのざき整形外科",
         "はかた外科胃腸科",
@@ -103,7 +103,7 @@
         return "#607d8b";
       }
 
-      Papa.parse(url, {
+      Papa.parse(csvdata, {
         download: true,
         header: true,
         skipEmptyLines: true,

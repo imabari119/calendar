@@ -5,7 +5,3 @@
 ## 最新データ
 
 https://github.com/imabari119/calendar/blob/main/latest.csv
-
-## カレンダー表示
-
-https://imabari.jpn.org/imabari119/calendar.html
